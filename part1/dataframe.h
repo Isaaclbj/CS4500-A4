@@ -411,50 +411,137 @@ class StringColumn : public Column {
  */
 class Schema : public Object {
  public:
- 
+  // an array of chars representing each col's type
+  char *types;
+  size_t rows;
+  size_t cols;
+  // an array of string*s 
+  linked_array *row_names;
+  linked_array *col_names;
+
   /** Copying constructor */
   Schema(Schema& from)
+  {
+    rows = from.rows;
+    cols = from.cols;
+    if(!from.types)
+    {
+      return;
+    }
+    types = duplicate(from.types);
+    this->row_names = new linked_array(*from.row_names);
+    this->col_names = new linked_array(*from.col_names);
+  }
  
   /** Create an empty schema **/
   Schema()
+  {
+    rows = 0;
+    cols = 0;
+    types = new char[1];
+    this->row_names = new linked_array();
+    this->col_names = new linked_array();
+  }
  
   /** Create a schema from a string of types. A string that contains
     * characters other than those identifying the four type results in
     * undefined behavior. The argument is external, a nullptr argument is
     * undefined. **/
   Schema(const char* types)
+  {
+    this->types = duplicate(types);
+    cols = strlen(types);
+    rows = 0;
+  }
  
+  ~Schema()
+  {
+    delete(types);
+    delete(row_names);
+    delete(col_names);
+  }
+
   /** Add a column of the given type and name (can be nullptr), name
     * is external. Names are expectd to be unique, duplicates result
     * in undefined behavior. */
   void add_column(char typ, String* name)
+  {
+    cols++;
+    char *temp = new char[strlen(types) + 2];
+    strcpy(temp, types);
+    temp[strlen(types)] = typ;
+    delete(types);
+    types = temp;
+    col_names->push_back(name);
+  }
  
   /** Add a row with a name (possibly nullptr), name is external.  Names are
    *  expectd to be unique, duplicates result in undefined behavior. */
   void add_row(String* name)
+  {
+    rows++;
+    row_names->push_back(name);
+  }
  
   /** Return name of row at idx; nullptr indicates no name. An idx >= width
     * is undefined. */
   String* row_name(size_t idx)
+  {
+    return (String*) row_names->get(idx);
+  }
  
   /** Return name of column at idx; nullptr indicates no name given.
     *  An idx >= width is undefined.*/
   String* col_name(size_t idx)
+  {
+    return (String*) col_names->get(idx);
+  }
  
   /** Return type of column at idx. An idx >= width is undefined. */
   char col_type(size_t idx)
+  {
+    return types[idx];
+  }
  
   /** Given a column name return its index, or -1. */
   int col_idx(const char* name)
+  {
+    for(int ii = 0; col_names->get(ii); ii++)
+    {
+      String *temp = (String*)col_names->get(ii);
+      if(strcmp(temp->to_string(), name) == 0)
+      {
+        return ii;
+      }
+    }
+    return -1;
+  }
  
   /** Given a row name return its index, or -1. */
   int row_idx(const char* name)
+  {
+    for(int ii = 0; row_names->get(ii); ii++)
+    {
+      String *temp = (String*)row_names->get(ii);
+      if(strcmp(temp->to_string(), name) == 0)
+      {
+        return ii;
+      }
+    }
+    return -1;
+  }
  
   /** The number of columns */
   size_t width()
+  {
+    return cols;
+  }
  
   /** The number of rows */
   size_t length()
+  {
+    return rows;
+  }
 };
  
 /*****************************************************************************

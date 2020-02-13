@@ -3,11 +3,29 @@
 
 class linked_array : public Object
 {
+    // linked_array doesn't own items
     public:
         void **items;
         size_t max;
         size_t size;
         linked_array *next;
+
+
+    //copy
+    linked_array(linked_array& from)
+    {
+        items = new void*[from.max];
+        max = from.max;
+        size = from.size;
+        for (int ii = 0; ii < size; ii++)
+        {
+            items[ii] = from.items[ii];
+        }
+        if(from.next)
+        {
+            this->next = new linked_array(*from.next);
+        }
+    }
 
     linked_array()
     {
@@ -28,10 +46,6 @@ class linked_array : public Object
         if(next)
         {
             delete(next);
-        }
-        for(int ii = 0; ii < size; ii++)
-        {
-            delete(items[ii]);
         }
         delete[](items);
     }
@@ -119,5 +133,15 @@ class linked_array : public Object
             }
         }
         return 0;
+    }
+
+    // delete all pointers stored in this linked_array
+    void dump()
+    {
+        for(int ii = 0; ii < size; ii++)
+        {
+            if(items[ii])
+                delete(items[ii]);
+        }
     }
 };

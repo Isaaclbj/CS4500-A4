@@ -1,7 +1,7 @@
 #pragma once                                                                     
 //lang::Cpp                                                                                                                                                       
 #include <cstdlib>                                                               
-#include <iostream> 
+#include <iostream>
 #include <string.h>
                                                                                                                                               
 /** Helper class providing some C++ functionality and convenience                
