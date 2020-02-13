@@ -140,8 +140,7 @@ class linked_array : public Object
     {
         for(int ii = 0; ii < size; ii++)
         {
-            if(items[ii])
-                delete(items[ii]);
+            // ??
         }
     }
 };
