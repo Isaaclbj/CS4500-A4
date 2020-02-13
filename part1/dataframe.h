@@ -4,6 +4,13 @@
 #include "string.h"
 #include "linked_array.h"
 #include <stdlib.h>
+
+// forward declearation
+class IntColumn;
+class BoolColumn;
+class FloatColumn;
+class StringColumn;
+
 /**************************************************************************
  * Column ::
  * Represents one column of a data frame which holds values of a single type.
@@ -40,7 +47,10 @@ class Column : public Object {
   virtual void push_back(String* val);
  
  /** Returns the number of elements in the column. */
-  virtual size_t size();
+  virtual size_t size()
+  {
+    return 0;
+  }
  
   /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'. */
   char get_type()
@@ -75,24 +85,23 @@ class Column : public Object {
 class IntColumn : public Column {
  public:
   // fields
-  size_t size;
+  size_t len;
   linked_array *values;
   char *name;
 
   IntColumn()
   {
-    size = 0;
+    len = 0;
     values = new linked_array();
-    name = "\0";
   }
 
   IntColumn(int n, ...)
   {
     va_list ap;
     va_start(ap, n);
-    size = va_arg(ap, int);
+    len = va_arg(ap, int);
 
-    for(int ii = 0; ii < size; ii++)
+    for(int ii = 0; ii < len; ii++)
     {
       int *temp = new int;
       *temp = va_arg(ap, int);
@@ -102,7 +111,7 @@ class IntColumn : public Column {
 
   ~IntColumn()
   {
-    size = 0;
+    len = 0;
     if(values)
     {
       delete(values);
@@ -111,7 +120,7 @@ class IntColumn : public Column {
 
   int get(size_t idx)
   {
-    if(idx >= size)
+    if(idx >= len)
     {
       return 0;
     }
@@ -127,13 +136,13 @@ class IntColumn : public Column {
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, int val)
   {
-    if(idx > size)
+    if(idx > len)
     {
       // undefined
     }
-    if(idx == size)
+    if(idx == len)
     {
-      size ++;
+      len ++;
       int *temp = new int;
       *temp = val;
       values->push_back(temp);
@@ -151,7 +160,7 @@ class IntColumn : public Column {
   }
   size_t size()
   {
-    return size;
+    return len;
   }
 };
  
@@ -166,24 +175,23 @@ class BoolColumn : public Column {
 
   public:
     // fields
-    size_t size;
+    size_t len;
     linked_array *values;
     char *name;
 
     BoolColumn()
     {
-      size = 0;
+      len = 0;
       values = new linked_array();
-      name = "\0";
     }
 
     BoolColumn(int n, ...)
     {
       va_list ap;
       va_start(ap, n);
-      size = va_arg(ap, int);
+      len = va_arg(ap, int);
 
-      for(int ii = 0; ii < size; ii++)
+      for(int ii = 0; ii < len; ii++)
       {
         bool *temp = new bool;
         *temp = va_arg(ap, bool);
@@ -192,7 +200,7 @@ class BoolColumn : public Column {
     }
   ~BoolColumn()
   {
-    size = 0;
+    len = 0;
     if(values)
     {
       delete(values);
@@ -201,7 +209,7 @@ class BoolColumn : public Column {
   
   bool get(size_t idx)
   {
-    if(idx >= size)
+    if(idx >= len)
     {
       return 0;
     }
@@ -219,13 +227,13 @@ class BoolColumn : public Column {
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, bool val)
   {
-    if(idx > size)
+    if(idx > len)
     {
       // undefined
     }
-    if(idx == size)
+    if(idx == len)
     {
-      size ++;
+      len ++;
       bool *temp = new bool;
       *temp = val;
       values->push_back(temp);
@@ -242,7 +250,7 @@ class BoolColumn : public Column {
   }
   size_t size()
   {
-    return size;
+    return len;
   }
 
 };
@@ -255,24 +263,23 @@ class FloatColumn : public Column {
 
   public:
     // fields
-    size_t size;
+    size_t len;
     linked_array *values;
     char *name;
 
     FloatColumn()
     {
-      size = 0;
+      len = 0;
       values = new linked_array();
-      name = "\0";
     }
 
     FloatColumn(int n, ...)
     {
       va_list ap;
       va_start(ap, n);
-      size = va_arg(ap, int);
+      len = va_arg(ap, int);
 
-      for(int ii = 0; ii < size; ii++)
+      for(int ii = 0; ii < len; ii++)
       {
         float *temp = new float;
         *temp = va_arg(ap, float);
@@ -281,7 +288,7 @@ class FloatColumn : public Column {
     }
   ~FloatColumn()
   {
-    size = 0;
+    len = 0;
     if(values)
     {
       delete(values);
@@ -290,7 +297,7 @@ class FloatColumn : public Column {
   
   float get(size_t idx)
   {
-    if(idx >= size)
+    if(idx >= len)
     {
       return 0;
     }
@@ -308,13 +315,13 @@ class FloatColumn : public Column {
   /** Set value at idx. An out of bound idx is undefined.  */
   void set(size_t idx, float val)
   {
-    if(idx > size)
+    if(idx > len)
     {
       // undefined
     }
-    if(idx == size)
+    if(idx == len)
     {
-      size ++;
+      len ++;
       float *temp = new float;
       *temp = val;
       values->push_back(temp);
@@ -329,7 +336,7 @@ class FloatColumn : public Column {
   }
   size_t size()
   {
-    return size;
+    return len;
   }
 };
  
@@ -340,23 +347,22 @@ class FloatColumn : public Column {
  */
 class StringColumn : public Column {
  public:
-    size_t size;
+    size_t len;
     linked_array *values;
     char *name;
 
   StringColumn()
   {
-    size = 0;
-    name = "\0";
+    len = 0;
     values = new linked_array();
   }
   StringColumn(int n, ...)
   {
       va_list ap;
       va_start(ap, n);
-      size = va_arg(ap, int);
+      len = va_arg(ap, int);
 
-      for(int ii = 0; ii < size; ii++)
+      for(int ii = 0; ii < len; ii++)
       {
         String *temp = new String(va_arg(ap, char*));
         values->push_back(temp);
@@ -369,7 +375,7 @@ class StringColumn : public Column {
   /** Returns the string at idx; undefined on invalid idx.*/
   String* get(size_t idx)
   {
-    if(idx >= size)
+    if(idx >= len)
     {
       return 0;
     }
@@ -381,13 +387,13 @@ class StringColumn : public Column {
   /** Acquire ownership fo the string.  Out of bound idx is undefined. */
   void set(size_t idx, String* val)
   {
-    if(idx > size)
+    if(idx > len)
     {
       // undefined
     }
-    if(idx == size)
+    if(idx == len)
     {
-      size ++;
+      len ++;
       values->push_back(val);
     }
     else
@@ -398,7 +404,7 @@ class StringColumn : public Column {
   }
   size_t size()
   {
-    return size;
+    return len;
   }
 };
  
@@ -662,7 +668,7 @@ class Row : public Object {
     * Calling this method before the row's fields have been set is undefined. */
   void visit(size_t idx, Fielder& f)
   {
-    for(int ii = 0; ii < scm.width; ii++)
+    for(int ii = 0; ii < scm.width(); ii++)
     {
       if(scm.types[ii] == 'I')
       {
