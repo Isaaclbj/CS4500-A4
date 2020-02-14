@@ -519,7 +519,7 @@ class Schema : public Object {
     for(int ii = 0; col_names->get(ii); ii++)
     {
       String *temp = (String*)col_names->get(ii);
-      if(strcmp(temp->to_string(), name) == 0)
+      if(strcmp(temp->c_str(), name) == 0)
       {
         return ii;
       }
@@ -533,7 +533,7 @@ class Schema : public Object {
     for(int ii = 0; row_names->get(ii); ii++)
     {
       String *temp = (String*)row_names->get(ii);
-      if(strcmp(temp->to_string(), name) == 0)
+      if(strcmp(temp->c_str(), name) == 0)
       {
         return ii;
       }
@@ -706,12 +706,14 @@ class Row : public Object {
  */
 class Rower : public Object {
  public:
+  Rower();
+  ~Rower();
   /** This method is called once per row. The row object is on loan and
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
       should be kept. */
   virtual bool accept(Row& r);
-
+ 
   /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
@@ -789,7 +791,7 @@ class DataFrame : public Object {
     for(int ii = 0; schm->col_names->get(ii); ii++)
     {
       String *temp = (String*)schm->col_names->get(ii);
-      if(col.compare(temp) == 0)
+      if(col.equals(temp) == 0)
       {
         return ii;
       }
@@ -803,7 +805,7 @@ class DataFrame : public Object {
     for(int ii = 0; schm->row_names->get(ii); ii++)
     {
       String *temp = (String*)schm->row_names->get(ii);
-      if(row.compare(temp) == 0)
+      if(row.equals(temp) == 0)
       {
         return ii;
       }
@@ -890,7 +892,7 @@ class DataFrame : public Object {
       r.accept(*(Row*)rows->get(ii));
     }
   }
-
+ 
   /** Visits the rows in order from starting index to ending index. This
 	  is used in pmap's threads to delineate where each thread starts/ends. */
   void limited_map(Rower& r, size_t start_idx, size_t end_idx)
@@ -902,25 +904,25 @@ class DataFrame : public Object {
   }
 
   /** This method clones the Rower and executes the map in parallel. Join is
-  * used at the end to merge the results. 
+  * used at the end to merge the results.
   *
   * This uses two threads.
   */
   void pmap(Rower& r)
   {
 	  //Check if the dataframe is too small to multithread
-	  if (schm->length() < THREADS) 
+	  if (schm->length() < THREADS)
 	  {
 		  map(r);
 	  }
-	  else 
+	  else
 	  {
 		  Rower* r_clone = (Rower*)r.clone();
 
 		  if (schm->length() % 2)	//odd case
 		  {
-			  std::thread t1(limited_map, r, 0, schm->length()/2);
-			  std::thread t2(limited_map, (*r_clone), schm->length()/2 + 1, schm->length());
+			  std::thread t1(limited_map, r, 0, schm->length() / 2);
+			  std::thread t2(limited_map, (*r_clone), schm->length() / 2 + 1, schm->length());
 			  t1.join();
 			  t2.join();
 
@@ -935,7 +937,8 @@ class DataFrame : public Object {
 		  r.join_delete(r_clone);
 	  }
   }
- 
+
+
   /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
   DataFrame* filter(Rower& r)
@@ -963,7 +966,7 @@ class DataFrame : public Object {
       {
         if(schm->types[cc] == 'S')
         {
-          printf("%s ", get_string(cc, rr)->val_);
+          printf("%s ", get_string(cc, rr)->c_str());
           continue;
         }
         if(schm->types[cc] == 'I')
