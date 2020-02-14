@@ -516,7 +516,7 @@ class Schema : public Object {
     for(int ii = 0; col_names->get(ii); ii++)
     {
       String *temp = (String*)col_names->get(ii);
-      if(strcmp(temp->to_string(), name) == 0)
+      if(strcmp(temp->c_str(), name) == 0)
       {
         return ii;
       }
@@ -530,7 +530,7 @@ class Schema : public Object {
     for(int ii = 0; row_names->get(ii); ii++)
     {
       String *temp = (String*)row_names->get(ii);
-      if(strcmp(temp->to_string(), name) == 0)
+      if(strcmp(temp->c_str(), name) == 0)
       {
         return ii;
       }
@@ -703,6 +703,8 @@ class Row : public Object {
  */
 class Rower : public Object {
  public:
+  Rower();
+  ~Rower();
   /** This method is called once per row. The row object is on loan and
       should not be retained as it is likely going to be reused in the next
       call. The return value is used in filters to indicate that a row
@@ -713,7 +715,7 @@ class Rower : public Object {
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
-  void join_delete(Rower* other);
+  virtual void join_delete(Rower* other);
 };
  
 /****************************************************************************
@@ -786,7 +788,7 @@ class DataFrame : public Object {
     for(int ii = 0; schm->col_names->get(ii); ii++)
     {
       String *temp = (String*)schm->col_names->get(ii);
-      if(col.compare(temp) == 0)
+      if(col.equals(temp) == 0)
       {
         return ii;
       }
@@ -800,7 +802,7 @@ class DataFrame : public Object {
     for(int ii = 0; schm->row_names->get(ii); ii++)
     {
       String *temp = (String*)schm->row_names->get(ii);
-      if(row.compare(temp) == 0)
+      if(row.equals(temp) == 0)
       {
         return ii;
       }
@@ -915,7 +917,7 @@ class DataFrame : public Object {
       {
         if(schm->types[cc] == 'S')
         {
-          printf("%s ", get_string(cc, rr)->val_);
+          printf("%s ", get_string(cc, rr)->c_str());
           continue;
         }
         if(schm->types[cc] == 'I')
