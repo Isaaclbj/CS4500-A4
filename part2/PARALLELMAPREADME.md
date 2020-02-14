@@ -1,5 +1,9 @@
 Example use-cases of your pmap:
-
+    A sample use-case would be some sort of conditional summation - the first example being
+    booleans checked before adding up the values in a column together, like a spreadsheet
+    addition function with restrictions. Another one would be a sort of chat parser,
+    feeding large amounts of strings into one continuous buffer and displaying that portion
+    of the buffer at any given momemnt.
 
 Describe your design for your parallel map:
     pmap delegates cloning to the subclass that implements Rower. Thus, cloning can be 
@@ -9,7 +13,11 @@ Describe your design for your parallel map:
 
 Describe how the examples in your parallel_map_examples.cpp file demonstrate that pmap is faster:
     In these extremely large use cases (a million rows), differences in trivial cases 
-    (time taken to clone the )
+    (time taken to clone the extra objects, switching between processes and calls, etc) are
+    eventually overtaken by the sheer amount of times the process is calling the row reader.
+    By "slicing" the amount of times a processor has to go back and read a row (1 million to 
+    ~500000 in the first use case) and distributing that between two threads, we save on time 
+    asymptotically.
 
 Describe issues that you encountered in implementing your parallel map:
     Because the Rower's dataframe is read-only (currently), we have to gripe with the fact that 
